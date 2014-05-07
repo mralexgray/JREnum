@@ -1,5 +1,4 @@
-#import <Foundation/Foundation.h>
-#import "SplitEnums.h"
+#import <AtoZ/AtoZ.h>#import "SplitEnums.h"
 
 JREnum(EnumWith1ConstantSansExplicitValues,
        EnumWith1ConstantSansExplicitValues_Constant1);

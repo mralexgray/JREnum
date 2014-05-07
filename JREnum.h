@@ -17,6 +17,7 @@
     typedef enum {  \
         ENUM_CONSTANTS  \
     } ENUM_TYPENAME;    \
+    extern NSDictionary* ENUM_TYPENAME##ByHex();  \
     extern NSDictionary* ENUM_TYPENAME##ByValue();  \
     extern NSDictionary* ENUM_TYPENAME##ByLabel();  \
     extern NSString* ENUM_TYPENAME##ToString(int enumValue);    \
@@ -34,6 +35,8 @@
 //--
 
 #define _JREnum_GenerateImplementation(ENUM_TYPENAME)  \
+    _Pragma("clang diagnostic push") \
+    _Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"") \
     NSArray* _JREnumParse##ENUM_TYPENAME##ConstantsString() {	\
         NSString *constantsString = _##ENUM_TYPENAME##_constants_string; \
         constantsString = [[constantsString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsJoinedByString:@""]; \
@@ -89,7 +92,16 @@
         }	\
         return result;	\
     }	\
-        \
+    NSDictionary* ENUM_TYPENAME##ByHex() {	\
+      NSArray *constants = _JREnumParse##ENUM_TYPENAME##ConstantsString();	\
+      NSMutableDictionary *result = [NSMutableDictionary new]; \
+        for (NSUInteger i = 0; i < [constants count]; i += 2) {	\
+            NSString *label = [constants objectAtIndex:i];	\
+            NSNumber *value = [constants objectAtIndex:i+1];	\
+            [result setObject:value forKey:label];	\
+        }	\
+        return result;	\
+    }    \
     NSString* ENUM_TYPENAME##ToString(int enumValue) {	\
         NSString *result = [ENUM_TYPENAME##ByValue() objectForKey:[NSNumber numberWithInt:enumValue]];	\
         if (!result) {	\
@@ -106,4 +118,5 @@
         } else {	\
             return NO;	\
         }	\
-    }
+    }\
+    _Pragma("clang diagnostic pop")
